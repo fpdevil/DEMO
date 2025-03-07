@@ -1,25 +1,67 @@
 pipeline {
     agent any
     stages {
-        stage ('Build') {
+        stage("Build") {
             steps {
-                echo "Building the Application..."
+                echo "Build stage."
+            }
+            post {
+                always {
+                    echo "This block always runs after this stage."
+                }
             }
         }
- 
+        stage("Test") {
+            steps {
+                echo "Test stage."
+            }
+            post {
+                unstable {
+                    echo "This block runs when the status of this stage is marked unstable."
+                }
+            }
+        }
+        stage("Release") {
+            steps {
+                echo "Release stage."
+            }
+            post {
+                success {
+                    echo "This block runs when the stage succeeded."
+                }
+            }
+        }
     }
     post {
-        // Only run when the current pipeline or specific stage has success 
-        success {
-            echo "# POST  ===> SUCCESFULLY Triggered"
-        }
-        // this will run only when the current pipeline or stage has failed
-        failure {
-            echo "# POST  ===> FAILURE Triggered"
-        }
-        // this will run regardless of the pipeline status
         always {
-            echo "# POST  ===> ALWAYS Triggered"
+            echo "This block always runs."
+        }
+        changed {
+            echo "This block runs when the current status is different than the previous one."
+        }
+        fixed {
+            echo "This block runs when the current status is success and the previous one was failed or unstable."
+        }
+        regression {
+            echo "This block runs when the current status is anything except success but the previous one was successful."
+        }
+        unstable {
+            echo "This block runs if the current status is marked unstable."
+        }
+        aborted {
+            echo "This block runs when the build process is aborted."
+        }
+        failure {
+            echo "This block runs when the build is failed."
+        }
+        success {
+            echo "This block runs when the build is succeeded."
+        }
+        unsuccessful {
+            echo "This block runs when the current status is anything except success."
+        }
+        cleanup {
+            echo "This block always runs after other conditions are evaluated."
         }
     }
 }
